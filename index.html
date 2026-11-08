@@ -1,0 +1,353 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TEMIA | Online Shopping</title>
+<style>
+:root {
+  --green:#087b45;
+  --dark:#064c30;
+  --light:#e9f8ef;
+  --bg:#f7faf8;
+  --white:#fff;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;background:var(--bg);color:#17251c}
+header{
+ background:var(--white);padding:16px 5%;
+ display:flex;align-items:center;justify-content:space-between;
+ position:sticky;top:0;z-index:10;
+ box-shadow:0 2px 12px #0000000b;
+}
+.logo{font-size:27px;font-weight:900;color:var(--green)}
+.logo span{color:#a1ce37}
+nav{display:flex;gap:20px}
+nav a{text-decoration:none;color:#34443a;font-weight:600}
+.cart-btn,.primary{
+ background:var(--green);color:white;border:0;
+ padding:12px 18px;border-radius:9px;font-weight:bold;cursor:pointer
+}
+.hero{
+ margin:22px 5%;padding:55px 30px;border-radius:20px;
+ background:linear-gradient(120deg,#064c30,#12a563);
+ color:white;display:flex;justify-content:space-between;align-items:center;
+ min-height:240px;gap:20px;
+}
+.hero h1{font-size:clamp(30px,5vw,48px);margin-bottom:12px}
+.hero p{line-height:1.7;max-width:440px}
+.hero .offer{font-size:70px}
+.search-area{padding:10px 5%}
+.search-area input{
+ width:100%;padding:15px;border:1px solid #ddd;border-radius:10px;
+ font-size:16px;outline-color:var(--green)
+}
+.categories{display:flex;gap:10px;overflow:auto;padding:15px 5%}
+.category{
+ background:white;border:1px solid #ddd;padding:10px 18px;
+ border-radius:30px;white-space:nowrap;cursor:pointer
+}
+.category.active{background:var(--green);color:white}
+.section{padding:20px 5%}
+.section h2{margin-bottom:18px}
+.products{
+ display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));
+ gap:16px
+}
+.product{
+ background:white;border-radius:13px;overflow:hidden;
+ box-shadow:0 3px 14px #00000009
+}
+.product img{width:100%;height:165px;object-fit:cover;background:#e9f8ef}
+.product-info{padding:12px}
+.product h3{font-size:15px;margin-bottom:8px}
+.price{font-weight:800;color:var(--green);font-size:18px}
+.old{color:#999;text-decoration:line-through;font-size:12px}
+.product button{width:100%;margin-top:12px}
+.cart-panel{
+ background:white;padding:20px;margin:20px 5%;
+ border-radius:14px;display:none
+}
+.cart-item{
+ display:flex;justify-content:space-between;align-items:center;
+ padding:12px 0;border-bottom:1px solid #eee;gap:10px
+}
+.cart-item button{padding:5px 9px}
+.total{font-size:22px;font-weight:bold;margin:20px 0}
+.checkout{
+ background:white;margin:20px 5%;padding:22px;
+ border-radius:15px;display:none
+}
+.checkout input{
+ width:100%;padding:13px;margin:8px 0 15px;
+ border:1px solid #ddd;border-radius:8px
+}
+.payment{
+ padding:15px;background:var(--light);border-radius:10px;
+ margin:15px 0;line-height:1.8
+}
+.payment strong{color:var(--dark)}
+footer{
+ background:#063d29;color:white;text-align:center;
+ padding:35px 15px;margin-top:40px;line-height:2
+}
+footer a{color:#b6edc8}
+.wa{
+ position:fixed;bottom:20px;right:18px;
+ background:#20bd63;color:white;padding:15px 18px;
+ border-radius:50px;text-decoration:none;font-weight:bold;
+ box-shadow:0 4px 15px #0003;z-index:20
+}
+.small{color:#6a786f;font-size:12px;line-height:1.6}
+@media(max-width:600px){
+ nav{display:none}
+ .hero{padding:35px 20px}
+ .hero .offer{font-size:42px}
+ .products{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .product img{height:140px}
+}
+</style>
+</head>
+<body>
+
+<header>
+ <div class="logo">TEM<span>I</span>A.</div>
+ <nav>
+  <a href="#">Home</a>
+  <a href="#products">Shop</a>
+  <a href="#footer">Contact</a>
+ </nav>
+ <button class="cart-btn" onclick="showCart()">
+  🛒 Cart (<span id="count">0</span>)
+ </button>
+</header>
+
+<section class="hero">
+ <div>
+  <h1>Shop smarter.<br>Live better.</h1>
+  <p>Discover amazing products at affordable prices.
+     Welcome to TEMIA, your everyday shopping destination.</p>
+  <br>
+  <a href="#products" style="background:white;color:#087b45;
+  padding:12px 20px;border-radius:8px;text-decoration:none;
+  font-weight:bold">Explore products →</a>
+ </div>
+ <div class="offer">🛍️</div>
+</section>
+
+<div class="search-area">
+ <input id="search" placeholder="🔍 Search for products..."
+ oninput="renderProducts()">
+</div>
+
+<div class="categories" id="categories">
+ <button class="category active" onclick="setCategory('All',this)">All</button>
+ <button class="category" onclick="setCategory('Electronics',this)">Electronics</button>
+ <button class="category" onclick="setCategory('Fashion',this)">Fashion</button>
+ <button class="category" onclick="setCategory('Gaming',this)">Gaming</button>
+ <button class="category" onclick="setCategory('Accessories',this)">Accessories</button>
+</div>
+
+<section class="section" id="products">
+ <h2>🔥 Trending products</h2>
+ <div class="products" id="product-list"></div>
+</section>
+
+<section class="cart-panel" id="cart">
+ <h2>🛒 Your shopping cart</h2>
+ <div id="cart-items"></div>
+ <div class="total">Total: ₦<span id="total">0</span></div>
+ <button class="primary" onclick="goCheckout()">Proceed to checkout</button>
+ <button class="primary" style="background:#777" onclick="hideCart()">Continue shopping</button>
+</section>
+
+<section class="checkout" id="checkout">
+ <h2>Complete your order</h2>
+ <p class="small">Enter your delivery information below.</p>
+
+ <label>Full name</label>
+ <input id="customer" placeholder="Your full name">
+
+ <label>WhatsApp phone number</label>
+ <input id="phone" placeholder="080XXXXXXXX">
+
+ <label>Delivery address</label>
+ <input id="address" placeholder="Enter your delivery address">
+
+ <div class="payment">
+  <h3>🏦 Bank transfer</h3>
+  <p>Bank: <strong>PalmPay</strong></p>
+  <p>Account number: <strong>8071082371</strong></p>
+  <p>Account name: Confirm the displayed beneficiary name before paying.</p>
+  <p class="small">Transfer the exact order amount. Your order will remain pending until payment is verified.</p>
+ </div>
+
+ <div class="payment">
+  <h3>💳 Card payment</h3>
+  <p>Secure card payment integration is ready for a Paystack or Flutterwave checkout connection.</p>
+  <p class="small">Card payments are not enabled yet. Never enter card details directly on this website.</p>
+ </div>
+
+ <button class="primary" style="width:100%" onclick="placeOrder()">
+  Send order through WhatsApp
+ </button>
+ <p class="small" style="margin-top:12px">
+  Sending an order does not automatically confirm payment.
+ </p>
+</section>
+
+<footer id="footer">
+ <h2>TEMIA.</h2>
+ <p>Your favourite online shopping destination.</p>
+ <p>Customer support: 08071082371</p>
+ <p>© 2026 TEMIA. All rights reserved.</p>
+</footer>
+
+<a class="wa" href="https://wa.me/2348071082371" target="_blank">
+ WhatsApp 💬
+</a>
+
+<script>
+const products = [
+ {id:1,name:"Wireless Headphones",price:18000,category:"Electronics",
+ image:"https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500"},
+ {id:2,name:"Smart Watch",price:25000,category:"Electronics",
+ image:"https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500"},
+ {id:3,name:"Gaming Controller",price:22000,category:"Gaming",
+ image:"https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?w=500"},
+ {id:4,name:"Sneakers",price:30000,category:"Fashion",
+ image:"https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500"},
+ {id:5,name:"Gaming Headset",price:28000,category:"Gaming",
+ image:"https://images.unsplash.com/photo-1599669454699-248893623440?w=500"},
+ {id:6,name:"Sunglasses",price:8500,category:"Accessories",
+ image:"https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=500"},
+ {id:7,name:"Backpack",price:16000,category:"Fashion",
+ image:"https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=500"},
+ {id:8,name:"Mobile Phone",price:150000,category:"Electronics",
+ image:"https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=500"}
+];
+
+let cart = [];
+let category = "All";
+
+function money(n){
+ return n.toLocaleString("en-NG");
+}
+
+function renderProducts(){
+ const query=document.getElementById("search").value.toLowerCase();
+ const filtered=products.filter(p=>
+ (category==="All"||p.category===category)&&
+ p.name.toLowerCase().includes(query)
+ );
+
+ document.getElementById("product-list").innerHTML=
+ filtered.map(p=>`
+ <div class="product">
+  <img src="${p.image}" alt="${p.name}" loading="lazy">
+  <div class="product-info">
+   <h3>${p.name}</h3>
+   <p class="price">₦${money(p.price)}</p>
+   <button class="primary" onclick="addToCart(${p.id})">
+    Add to cart +
+   </button>
+  </div>
+ </div>`).join("") || "<p>No products found.</p>";
+}
+
+function setCategory(c,btn){
+ category=c;
+ document.querySelectorAll(".category").forEach(b=>b.classList.remove("active"));
+ btn.classList.add("active");
+ renderProducts();
+}
+
+function addToCart(id){
+ const item=cart.find(p=>p.id===id);
+ if(item)item.qty++;
+ else cart.push({...products.find(p=>p.id===id),qty:1});
+ updateCart();
+}
+
+function updateCart(){
+ document.getElementById("count").textContent=
+ cart.reduce((s,p)=>s+p.qty,0);
+
+ document.getElementById("cart-items").innerHTML=
+ cart.map(p=>`
+ <div class="cart-item">
+  <div><strong>${p.name}</strong><br>₦${money(p.price)}</div>
+  <div>
+   <button onclick="changeQty(${p.id},-1)">−</button>
+   ${p.qty}
+   <button onclick="changeQty(${p.id},1)">+</button>
+  </div>
+ </div>`).join("");
+
+ document.getElementById("total").textContent=
+ money(cart.reduce((s,p)=>s+p.price*p.qty,0));
+}
+
+function changeQty(id,n){
+ const item=cart.find(p=>p.id===id);
+ if(!item)return;
+ item.qty+=n;
+ if(item.qty<=0)cart=cart.filter(p=>p.id!==id);
+ updateCart();
+}
+
+function showCart(){
+ document.getElementById("cart").style.display="block";
+ document.getElementById("cart").scrollIntoView({behavior:"smooth"});
+}
+
+function hideCart(){
+ document.getElementById("cart").style.display="none";
+}
+
+function goCheckout(){
+ if(!cart.length)return alert("Your cart is empty!");
+ document.getElementById("checkout").style.display="block";
+ document.getElementById("checkout").scrollIntoView({behavior:"smooth"});
+}
+
+function placeOrder(){
+ const name=document.getElementById("customer").value.trim();
+ const phone=document.getElementById("phone").value.trim();
+ const address=document.getElementById("address").value.trim();
+
+ if(!name||!phone||!address){
+  alert("Please complete all delivery details.");
+  return;
+ }
+ if(!cart.length){
+  alert("Your cart is empty.");
+  return;
+ }
+
+ const total=cart.reduce((s,p)=>s+p.price*p.qty,0);
+
+ let message=`HELLO TEMIA! I WANT TO PLACE AN ORDER\n\n`;
+ message+=`Customer: ${name}\nPhone: ${phone}\nAddress: ${address}\n\n`;
+ message+="ORDER DETAILS:\n";
+
+ cart.forEach(p=>{
+  message+=`${p.name} x ${p.qty} = NGN ${money(p.price*p.qty)}\n`;
+ });
+
+ message+=`\nTOTAL: NGN ${money(total)}`;
+ message+=`\n\nPayment method: PalmPay transfer`;
+ message+=`\nPlease confirm my order and payment instructions.`;
+
+ window.open(
+  "https://wa.me/2348071082371?text="+encodeURIComponent(message),
+  "_blank"
+ );
+}
+
+renderProducts();
+updateCart();
+</script>
+</body>
+</html>
